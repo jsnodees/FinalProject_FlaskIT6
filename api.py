@@ -55,11 +55,20 @@ def get_dependent_by_employee(id):
 def add_employee():
     curs = mysql.connection.cursor()
     info = request.get_json()
-    Fname = info["First_name:"]
-    Lname = info["Last_name:"]
+    Address = info["Address"]
+    Bdate = info["Bdate"]
+    DL_id = info["DL_id"]
+    Fname = info["Fname"]
+    Lname = info["Lname"]
+    Minit = info["Minit"]
+    Salary = info["Salary"]
+    Sex = info["Sex"]
+    Super_ssn = info["Super_ssn"]
+    ssn = info["ssn"]
     curs.execute(
-        """INSERT INTO EMPLOYEE (address, bdate, DL_id, first name, last name, Minit, 
-        Salary, Super_ssn, ssn) VALUE (%s, %s)""", (Fname, Lname),
+        """INSERT INTO EMPLOYEE (Address, Bdate, DL_id, Fname, Lname, Minit, 
+        Salary, Sex, Super_ssn, ssn) VALUE (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", (Address, Bdate, DL_id, Fname, Lname, Minit, 
+        Salary, Sex, Super_ssn, ssn),
     )
     mysql.connection.commit()
     print("row(s) affected :{}".format(curs.rowcount))
