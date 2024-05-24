@@ -2,6 +2,8 @@ from flask import Flask, make_response, jsonify, request
 from flask_mysqldb import MySQL
 from datetime import timedelta
 from flask_jwt_extended import JWTManager
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 
 
@@ -14,10 +16,16 @@ app.config["MYSQL_DB"] = "company"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
 app.config["JWT_SECRET_KEY"] = "your-secret-key"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)  # Example: tokens expire after 1 hour
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 
 jwt = JWTManager(app)
 mysql = MySQL(app)
+
+@app.route("/secure-endpoint")
+@jwt_required()
+def secure_endpoint():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
 
 @app.route("/")
 def hello_world():
