@@ -1,5 +1,9 @@
 from flask import Flask, make_response, jsonify, request
 from flask_mysqldb import MySQL
+from datetime import timedelta
+from flask_jwt_extended import JWTManager
+
+
 
 app = Flask(__name__)
 app.config["MYSQL_HOST"] = "localhost"
@@ -9,6 +13,10 @@ app.config["MYSQL_DB"] = "company"
 
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
+app.config["JWT_SECRET_KEY"] = "your-secret-key"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)  # Example: tokens expire after 1 hour
+
+jwt = JWTManager(app)
 mysql = MySQL(app)
 
 @app.route("/")
@@ -50,6 +58,28 @@ def get_dependent_by_employee(id):
     SELECT * FROM employee WHERE id = %s
     """.format(id))
     return make_response(jsonify({"ssn": id,  "count": len(data), "dependent": data}), 200)
+
+@app.route("/employees/search", methods=["GET"])
+def search_employee():
+    search_query = request.args.get("query")
+
+    if not search_query:
+        return make_response(jsonify({"error": "Query parameter 'query' is required."}), 400)
+
+    curs = mysql.connection.cursor()
+    try:
+        query = """
+        SELECT * FROM employee 
+        WHERE Fname LIKE %s OR Lname LIKE %s
+        """
+        curs.execute(query, ('%' + search_query + '%', '%' + search_query + '%'))
+        data = curs.fetchall()
+        curs.close()
+        return make_response(jsonify(data), 200)
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
+
+
 
 @app.route("/employees", methods=["POST"])
 def add_employee():
@@ -95,7 +125,7 @@ def update_emplotee(ssn):
 @app.route("/employees/<int:ssn>", methods=["DELETE"])
 def delete_employee(ssn):
     curs = mysql.connection.cursor()
-    curs.execute("""DELETE FROM employee WHERE ssn = %s """(ssn,))
+    curs.execute("""DELETE FROM employee WHERE ssn = %s """,(ssn,))
     mysql.connection.commit()
     rows_affected = curs.rowcount
     curs.close()
