@@ -3,9 +3,7 @@ from flask_mysqldb import MySQL
 from datetime import timedelta
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
-
-
+from flask_jwt_extended import create_access_token
 
 app = Flask(__name__)
 app.config["MYSQL_HOST"] = "localhost"
@@ -26,6 +24,14 @@ mysql = MySQL(app)
 def secure_endpoint():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+@app.route("/login", methods =["POST"])
+def login():
+    username = request.json.get("username: ")
+    password = request.json.get("password: ")
+
+
+
 
 @app.route("/")
 def hello_world():
