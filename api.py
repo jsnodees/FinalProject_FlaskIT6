@@ -76,6 +76,33 @@ def add_employee():
     curs.close()
     return make_response(jsonify({"message": "Employee added succesfully!", "rows_affected": rows_affected}), 201 )
 
+@app.route("/employees/<int:ssn>", methods=["PUT"])
+def update_emplotee(ssn):
+    curs = mysql.connection.cursor()
+    info = request.get_json()
+    Fname = info["Fname"]
+    Lname = info["Lname"]
+    Minit = info["Minit"]
+    curs.execute(
+        """ UPDATE employee SET Fname = %s, Lname = %s, Minit = %s WHERE ssn = %s""", 
+        (Fname, Lname, Minit, ssn)
+    )
+    mysql.connection.commit()
+    rows_affected = curs.rowcount
+    curs.close()
+    return make_response(jsonify({"message": "Employee updated succesfully!", "rows_affected": rows_affected}), 200 )
+
+@app.route("/employees/<int:ssn>", methods=["DELETE"])
+def delete_employee(ssn):
+    curs = mysql.connection.cursor()
+    curs.execute("""DELETE FROM employee WHERE ssn = %s """(ssn,))
+    mysql.connection.commit()
+    rows_affected = curs.rowcount
+    curs.close()
+    return make_response(jsonify(
+        {"message": "Employee deleted succesfully!", "rows_affected": rows_affected}
+        ), 
+        200 )
 
 if __name__ == "__main__":
     app.run(debug=True)
