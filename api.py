@@ -47,13 +47,7 @@ def get_employee_by_id(id):
 @app.route("/employees/<int:id>/dependent", methods=["GET"])
 def get_dependent_by_employee(id):
     data = data_fetch("""
-    SELECT employee.Fname, employee.Minit, employee.Lname
-    FROM employee
-    INNER JOIN Dependent_name
-    ON employee.ssn = Dependent_name.employee.ssn
-    INNER JOIN dependent
-    ON Dependent_name.employee.ssn = dependent.Dependent_name
-    WHERE employee.ssn = 123456789
+    SELECT * FROM employee WHERE id = %s
     """.format(id))
     return make_response(jsonify({"ssn": id,  "count": len(data), "dependent": data}), 200)
 
