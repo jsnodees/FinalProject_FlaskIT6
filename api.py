@@ -1,9 +1,6 @@
 from flask import Flask, make_response, jsonify, request
 from flask_mysqldb import MySQL
 from datetime import timedelta
-from flask_jwt_extended import JWTManager
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask_jwt_extended import create_access_token
 
 app = Flask(__name__)
 app.config["MYSQL_HOST"] = "localhost"
@@ -13,24 +10,7 @@ app.config["MYSQL_DB"] = "company"
 
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
-app.config["JWT_SECRET_KEY"] = "your-secret-key"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
-
-jwt = JWTManager(app)
 mysql = MySQL(app)
-
-@app.route("/secure-endpoint")
-@jwt_required()
-def secure_endpoint():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
-
-@app.route("/login", methods =["POST"])
-def login():
-    username = request.json.get("username: ")
-    password = request.json.get("password: ")
-
-
 
 
 @app.route("/")
@@ -92,8 +72,6 @@ def search_employee():
         return make_response(jsonify(data), 200)
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
-
-
 
 @app.route("/employees", methods=["POST"])
 def add_employee():
