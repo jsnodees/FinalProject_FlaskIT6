@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify
+from flask import Flask, make_response, jsonify, request
 from flask_mysqldb import MySQL
 
 app = Flask(__name__)
@@ -51,6 +51,21 @@ def get_dependent_by_employee(id):
     """.format(id))
     return make_response(jsonify({"ssn": id,  "count": len(data), "dependent": data}), 200)
 
+@app.route("/employees", methods=["POST"])
+def add_employee():
+    curs = mysql.connection.cursor()
+    info = request.get_json()
+    Fname = info["First_name:"]
+    Lname = info["Last_name:"]
+    curs.execute(
+        """INSERT INTO EMPLOYEE (address, bdate, DL_id, first name, last name, Minit, 
+        Salary, Super_ssn, ssn) VALUE (%s, %s)""", (Fname, Lname),
+    )
+    mysql.connection.commit()
+    print("row(s) affected :{}".format(curs.rowcount))
+    rows_affected = curs.rowcount
+    curs.close()
+    return make_response(jsonify({"message": "Employee added succesfully!", "rows_affected": rows_affected}), 201 )
 
 
 if __name__ == "__main__":
