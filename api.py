@@ -1,6 +1,5 @@
 from flask import Flask, make_response, jsonify, request
 from flask_mysqldb import MySQL
-from datetime import timedelta
 
 app = Flask(__name__)
 app.config["MYSQL_HOST"] = "localhost"
@@ -35,6 +34,7 @@ def get_employees():
     curs.close()
 
     return make_response(jsonify(data), 200)
+
 @app.route("/employees/<int:id>", methods=["GET"])
 def get_employee_by_id(id):
     curs = mysql.connection.cursor()
@@ -99,7 +99,7 @@ def add_employee():
     return make_response(jsonify({"message": "Employee added succesfully!", "rows_affected": rows_affected}), 201 )
 
 @app.route("/employees/<int:ssn>", methods=["PUT"])
-def update_emplotee(ssn):
+def update_employee(ssn):
     curs = mysql.connection.cursor()
     info = request.get_json()
     Fname = info["Fname"]
